@@ -1,3 +1,16 @@
 <resources>
     <string name="app_name">StudySync</string>
+    <string name="select_time">Select Time</string>
+    <string name="selected_time">Selected Time: %1$s</string>
+    <string name="add_subject">Add Subject</string>
+    <string name="enter_subject_hint">Enter subject name</string>
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
+    <string name="add_topic">Add Topic</string>
+    <string name="topic_name_hint">Topic Name</string>
+    <string name="save">Save</string>
+    <string name="sign_out">Sign Out</string>
+    <string name="sign_out_message">Are you sure you want to sign out?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

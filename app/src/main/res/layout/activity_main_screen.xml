@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main_layout_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_gradient">
+
+    <!-- MAIN CONTENT AREA -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- 🔝 TOP BAR -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="16dp">
+
+            <!-- Menu -->
+            <TextView
+                android:id="@+id/menuIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="☰"
+                android:textSize="24sp"
+                android:textColor="@color/darkText"
+                android:padding="8dp"/>
+
+            <!-- Date -->
+            <TextView
+                android:id="@+id/dateText"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Monday, 24 Feb"
+                android:textAlignment="center"
+                android:textColor="@color/darkText"
+                android:textSize="16sp"/>
+
+            <!-- Notification -->
+            <TextView
+                android:id="@+id/notificationIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🔔"
+                android:textSize="20sp"
+                android:padding="8dp"/>
+        </LinearLayout>
+
+        <!-- 👋 GREETING -->
+        <TextView
+            android:id="@+id/greetingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Hello, Deepika 👋"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="@color/darkText"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- 📚 SUBJECT GRID TITLE -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Your Subjects"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/darkText"
+            android:layout_marginBottom="8dp"/>
+        <!-- RECYCLER VIEW -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/subjectRecycler"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingBottom="8dp"/>
+
+        <!-- ➕ ADD BUTTON -->
+        <Button
+            android:id="@+id/addSubjectBtn"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="+ Add Subject"
+            android:textColor="@color/white"
+            android:background="@drawable/button_gradient"
+            android:layout_marginTop="12dp"/>
+
+        <!-- ⏱ STUDY HOURS -->
+        <TextView
+            android:id="@+id/studyHours"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Daily Study: 4 hrs"
+            android:textAlignment="center"
+            android:textSize="16sp"
+            android:textColor="@color/darkText"
+            android:layout_marginTop="12dp"/>
+
+    </LinearLayout>
+
+    <!-- DASHBOARD SIDE DRAWER (Hidden by default) -->
+    <LinearLayout
+        android:id="@+id/dashboardLayout"
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:background="#80E8F8F5"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:elevation="8dp"
+        android:visibility="gone"
+        android:layout_gravity="start">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Dashboard"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#0A1F44"
+            android:paddingBottom="16dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Today's Tasks"
+            android:textColor="#0A1F44"
+            android:padding="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Profile"
+            android:textColor="#0A1F44"
+            android:padding="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:textSize="16sp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Progress Tracker"
+            android:textColor="#0A1F44"
+            android:padding="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:textSize="16sp"/>
+        <TextView
+            android:id="@+id/signOutBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Sign out"
+            android:textColor="#0A1F44"
+            android:padding="12dp"
+            android:background="?attr/selectableItemBackground"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+</FrameLayout>
