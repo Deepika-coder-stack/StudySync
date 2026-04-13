@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/softBlue"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/navyBlue"
+            android:text="@string/Basic_Info"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_gravity="center"
+            android:layout_marginBottom="10dp"/>
+
+        <!-- Course Name -->
+        <EditText
+            android:id="@+id/etCourseName"
+            android:autofillHints="name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/Course_name"
+            android:inputType="text"
+            android:padding="12dp"
+            android:background="@android:drawable/edit_text"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Subjects Title -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/darkblue"
+            android:text="@string/subjects"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Container -->
+        <LinearLayout
+            android:id="@+id/subjectsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"/>
+
+        <!-- Add Button -->
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Add"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/rounded_bg"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFFFFF"/>
+
+        <!-- Continue Button -->
+        <Button
+            android:id="@+id/btnContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/btn"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#1E3A8A"
+            android:background="@drawable/button_gradient"
+            android:textColor="#FFFFFF"/>
+
+    </LinearLayout>
+</ScrollView>
