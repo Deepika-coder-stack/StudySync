@@ -52,8 +52,8 @@ class BasicInfoActivity : AppCompatActivity() {
                 Toast.LENGTH_SHORT
             ).show()
 
-            // 🚀 MOVE TO TASK SCREEN
-            val intent = Intent(this, TaskActivity::class.java)
+            // ✅ Navigate to MainScreen
+            val intent = Intent(this, MainScreen::class.java)
             startActivity(intent)
             finish()
         }

@@ -34,6 +34,19 @@ class MainScreen : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(layout.activity_main_screen)
+
+        val profile = findViewById<TextView>(R.id.profileIcon)
+        profile.setOnClickListener {
+            startActivity(Intent(this, ProfileActivity::class.java))
+        }
+        val tracker = findViewById<TextView>(R.id.trackerIcon)
+        tracker.setOnClickListener {
+            startActivity(Intent(this, TrackerActivity::class.java))
+        }
+        val task = findViewById<TextView>(R.id.taskIcon)
+        task.setOnClickListener {
+            startActivity(Intent(this, TaskActivity::class.java))
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             requestPermissions(arrayOf(android.Manifest.permission.POST_NOTIFICATIONS), 1)
         }

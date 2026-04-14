@@ -126,6 +126,9 @@
             android:paddingBottom="16dp"/>
 
         <TextView
+            android:id="@+id/taskIcon"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Today's Tasks"
@@ -135,6 +138,9 @@
             android:textSize="16sp"/>
 
         <TextView
+            android:id="@+id/profileIcon"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Profile"
@@ -143,6 +149,9 @@
             android:background="?attr/selectableItemBackground"
             android:textSize="16sp"/>
         <TextView
+            android:id="@+id/trackerIcon"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Progress Tracker"
