@@ -20,7 +20,7 @@
                 android:useLevel="true"
                 android:thickness="12dp">
 
-                <solid android:color="#4CAF50"/>
+                <solid android:color="@color/purple_700"/>
             </shape>
 
         </rotate>

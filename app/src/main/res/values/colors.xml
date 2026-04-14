@@ -30,12 +30,20 @@
     <!-- Card -->
     <color name="card_bg">#FFFFFF</color>
     <color name="cardBg">#FFFFFF</color>
+    <color name="green_1">#4CAF50</color>
 
     <!-- Primary Colors -->
     <color name="primaryBlue">#4A90E2</color>
+    <color name="light_B">#72CBF2</color>
     <color name="lightBlue">#D6E9FF</color>
+    <color name="green_shade">#52B9C5</color>
+    <color name="red">#F44336</color>
+    <color name="yellow">#FFC107</color>
     <color name="mintGreen">#50E3C2</color>
+    <color name="Green">#4CAF50</color>
     <color name="green">#50E3C2</color>
+    <color name="blue_shade">#ABE0F8</color>
+    <color name="blue_1">#92D5F4</color>
 
     <!-- Background Gradients -->
     <color name="softBlue">#E0F2FE</color>

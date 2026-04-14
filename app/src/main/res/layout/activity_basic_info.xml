@@ -58,8 +58,8 @@
             android:text="@string/Add"
             android:layout_marginTop="12dp"
             android:background="@drawable/rounded_bg"
-            android:backgroundTint="#4CAF50"
-            android:textColor="#FFFFFF"/>
+            android:backgroundTint="@color/green"
+            android:textColor="@color/black"/>
 
         <!-- Continue Button -->
         <Button
@@ -68,7 +68,7 @@
             android:layout_height="wrap_content"
             android:text="@string/btn"
             android:layout_marginTop="16dp"
-            android:backgroundTint="#1E3A8A"
+            android:backgroundTint="@color/blue"
             android:background="@drawable/button_gradient"
             android:textColor="#FFFFFF"/>
 
