@@ -1,4 +1,5 @@
 package com.igdtuw.studysync
+
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -12,7 +13,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         Handler(Looper.getMainLooper()).postDelayed({
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, MainScreen::class.java)
             startActivity(intent)
             finish()
         }, 2000) // 2 seconds

@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
     <!-- Default Android colors -->
@@ -30,5 +29,21 @@
 
     <!-- Card -->
     <color name="card_bg">#FFFFFF</color>
+    <!-- Primary Colors -->
+    <color name="primaryBlue">#4A90E2</color>
+    <color name="lightBlue">#D6E9FF</color>
+    <color name="mintGreen">#50E3C2</color>
+
+    <!-- Background -->
+    <color name="background">#F7F9FC</color>
+
+    <!-- Text -->
+    <color name="darkText">#1F2D3D</color>
+
+    <!-- White -->
+    <color name="white">#FFFFFF</color>
+
+    <!-- Card -->
+    <color name="cardBg">#FFFFFF</color>
 
 </resources>

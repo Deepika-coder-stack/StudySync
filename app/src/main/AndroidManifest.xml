@@ -6,6 +6,10 @@
 
     <!-- Gallery Image Permission (Android 13+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    >
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="true"
@@ -18,6 +22,28 @@
         <!-- Splash Screen (Launcher Activity) -->
         <activity
             android:name=".SplashActivity"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+
+        <!-- LOGIN SCREEN (FIRST SCREEN) -->
+        <activity
+            android:name=".LoginActivity"
+        android:theme="@style/Theme.StudySync">
+
+        <receiver android:name=".ReminderReceiver"
+            android:exported="false" />
+
+        <!-- Main Screen -->
+        <activity
+            android:name="com.igdtuw.studysync.MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name="com.igdtuw.studysync.MainScreen"
+            android:exported="false" />
+
+        <!-- Splash Screen (Launcher) -->
+        <activity
+            android:name="com.igdtuw.studysync.SplashActivity"
             android:exported="true">
 
             <intent-filter>
@@ -46,7 +72,11 @@
         <activity
             android:name=".TrackerActivity"
             android:exported="false"/>
+        <!-- BASIC INFO SCREEN -->
+        <activity android:name=".BasicInfoActivity" />
+
+        <!-- TASK SCREEN -->
+        <activity android:name=".TaskActivity" />
 
     </application>
-
 </manifest>
