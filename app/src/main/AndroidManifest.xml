@@ -1,25 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Gallery Image Permission (Old Android) -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!-- Gallery Image Permission (Android 13+) -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <application
         android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".SplashActivity"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar">
+
+        <!-- Splash Screen (Launcher Activity) -->
+        <activity
+            android:name=".SplashActivity"
             android:exported="true">
+
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+
         </activity>
 
-        <activity android:name=".MainActivity" />
+        <!-- Main Screen -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
+
+        <!-- Profile Screen -->
+        <activity
+            android:name=".ProfileActivity"
+            android:exported="false"/>
+
+        <!-- Edit Profile Screen -->
+        <activity
+            android:name=".EditProfileActivity"
+            android:exported="false"/>
+
+        <!-- Tracker Screen -->
+        <activity
+            android:name=".TrackerActivity"
+            android:exported="false"/>
 
     </application>
 
