@@ -1,5 +1,34 @@
 <resources>
 
+    <!-- Default Android colors -->
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- App Theme Colors -->
+    <color name="primary">#4A90E2</color>
+    <color name="accent">#50E3C2</color>
+
+    <!-- Background -->
+    <color name="background">#F4F6F7</color>
+
+    <!-- Text Colors -->
+    <color name="text_dark">#2E3A46</color>
+    <color name="text_light">#7A8A99</color>
+
+    <!-- UI Colors -->
+    <color name="primary_green">#7FB9A8</color>
+    <color name="light_green">#A8D5C2</color>
+    <color name="soft_blue">#A9C3E6</color>
+    <color name="soft_green">#BFE3D3</color>
+
+    <!-- Card -->
+    <color name="card_bg">#FFFFFF</color>
     <!-- Primary Colors -->
     <color name="primaryBlue">#4A90E2</color>
     <color name="primary">#4A90E2</color>

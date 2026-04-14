@@ -5,7 +5,7 @@
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
-      <SelectionState runConfigName="New Run Config">
+      <SelectionState runConfigName="profile">
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
     </selectionStates>
