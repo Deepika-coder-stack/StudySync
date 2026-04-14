@@ -2,6 +2,8 @@ package com.igdtuw.studysync
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 // Make sure to import your Button, EditText, etc.
 
@@ -13,7 +15,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         setContentView(R.layout.activity_basic_info)
 
-        // Now you can find your views by ID
-        // val loginBtn = findViewById<Button>(R.id.btnLogin)
+
+
+
+
     }
 }
