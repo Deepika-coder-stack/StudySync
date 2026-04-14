@@ -1,5 +1,4 @@
 <resources>
-
     <!-- Default Android colors -->
     <color name="purple_200">#FFBB86FC</color>
     <color name="purple_500">#FF6200EE</color>
@@ -15,11 +14,12 @@
     <color name="accent">#50E3C2</color>
 
     <!-- Background -->
-    <color name="background">#F4F6F7</color>
+    <color name="background">#F7F9FC</color>
 
     <!-- Text Colors -->
     <color name="text_dark">#2E3A46</color>
     <color name="text_light">#7A8A99</color>
+    <color name="darkText">#1F2D3D</color>
 
     <!-- UI Colors -->
     <color name="primary_green">#7FB9A8</color>
@@ -29,21 +29,23 @@
 
     <!-- Card -->
     <color name="card_bg">#FFFFFF</color>
+    <color name="cardBg">#FFFFFF</color>
+
     <!-- Primary Colors -->
     <color name="primaryBlue">#4A90E2</color>
     <color name="lightBlue">#D6E9FF</color>
     <color name="mintGreen">#50E3C2</color>
+    <color name="green">#50E3C2</color>
 
-    <!-- Background -->
-    <color name="background">#F7F9FC</color>
+    <!-- Background Gradients -->
+    <color name="softBlue">#E0F2FE</color>
+    <color name="bg_top">#F8FAFC</color>
+    <color name="bg_bottom">#F1F5F9</color>
 
-    <!-- Text -->
-    <color name="darkText">#1F2D3D</color>
-
-    <!-- White -->
-    <color name="white">#FFFFFF</color>
-
-    <!-- Card -->
-    <color name="cardBg">#FFFFFF</color>
-
+    <!-- Additional Colors -->
+    <color name="peach">#FFDAB9</color>
+    <color name="pista">#C0D890</color>
+    <color name="navyBlue">#1E3A8A</color>
+    <color name="darkblue">#1E40AF</color>
+    <color name="blue">#3B82F6</color>
 </resources>
