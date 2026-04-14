@@ -17,7 +17,7 @@
         <!-- LOGIN SCREEN (FIRST SCREEN) -->
         <activity
             android:name=".LoginActivity"
-        android:theme="@style/Theme.StudySync">
+        android:theme="@style/Theme.StudySync"/>
 
         <receiver android:name=".ReminderReceiver"
             android:exported="false" />
