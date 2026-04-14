@@ -53,6 +53,6 @@
         android:text="@string/login_btn"
         android:textAllCaps="false"
         android:background="@drawable/rounded_bg"
-        android:textColor="@color/white" />
+        android:textColor="@android:color/white" />
 
 </LinearLayout>

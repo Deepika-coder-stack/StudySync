@@ -37,7 +37,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textColor="@color/dark_blue"
+            android:textColor="@color/darkblue"
             android:text="@string/subjects"
             android:textSize="18sp"
             android:textStyle="bold"
@@ -58,6 +58,7 @@
             android:text="@string/Add"
             android:layout_marginTop="12dp"
             android:background="@drawable/rounded_bg"
+            android:backgroundTint="#4CAF50"
             android:textColor="#FFFFFF"/>
 
         <!-- Continue Button -->

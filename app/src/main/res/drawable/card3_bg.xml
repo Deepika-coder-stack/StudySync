@@ -1,5 +1,5 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android">
-    <solid android:color="@color/card"/>
+    <solid android:color="@color/cardBg"/>
     <corners android:radius="24dp"/>
     <padding android:top="10dp" android:bottom="10dp"
         android:left="10dp" android:right="10dp"/>
