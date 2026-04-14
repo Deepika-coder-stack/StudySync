@@ -1,5 +1,6 @@
 package com.igdtuw.studysync
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 // Make sure to import your Button, EditText, etc.

@@ -33,19 +33,39 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
-        compose = true
+        compose = false
     }
 }
 
 dependencies {
+
+    // Core Android
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // UI Components
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation(libs.androidx.constraintlayout)
+
+    // Image Library
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+
+    // Chart Library (enable later if needed)
+    // implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+
+    // Compose (kept because plugin is enabled)
     implementation(libs.androidx.activity.compose)
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+
+    // Testing
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(libs.androidx.activity)
@@ -53,10 +73,13 @@ dependencies {
     //implementation(androidx.cardview:cardview:1.0.0)
 
     testImplementation(libs.junit)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
