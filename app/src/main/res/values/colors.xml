@@ -1,20 +1,20 @@
 <resources>
-    <color name="primary">#4CAF50</color>
+
+    <!-- Primary Colors -->
+    <color name="primaryBlue">#4A90E2</color>
+    <color name="lightBlue">#D6E9FF</color>
+    <color name="mintGreen">#50E3C2</color>
+
+    <!-- Background -->
+    <color name="background">#F7F9FC</color>
+
+    <!-- Text -->
+    <color name="darkText">#1F2D3D</color>
+
+    <!-- White -->
     <color name="white">#FFFFFF</color>
-    <color name="black">#000000</color>
-    <color name="gray">#DDDDDD</color>
-    <color name="lightBlue">#C4DDF8</color>
-    <color name="navyBlue">#040A28</color>
-    <color name="blue">#62AAE4</color>
-    <color name="darkblue">#203BC1</color>
-    <color name="green">#66D9A3</color>
-    <color name="softBlue">#EAF2FF</color>
-    <color name="bg_top">#8FB6C9</color>
-    <color name="bg_bottom">#A9D1C2</color>
-    <color name="peach">#F4784D</color>
 
-    <color name="pista">#B3EBF2</color>
-    <color name="red">#E57C73</color>
+    <!-- Card -->
+    <color name="cardBg">#FFFFFF</color>
 
-    <color name="card">#F4F4F4</color>
 </resources>
