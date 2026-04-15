@@ -23,7 +23,7 @@
         android:id="@+id/subjectName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Subject"
+        android:text="@string/Subject1"
         android:textSize="16sp"
         android:textStyle="bold"
         android:textColor="#2C2C2C"/>
@@ -40,7 +40,7 @@
         android:id="@+id/addTopicBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="+ Add Topic"
+        android:text="@string/topic1"
         android:textColor="#00BFA6"
         android:textStyle="bold"
         android:paddingTop="6dp"/>

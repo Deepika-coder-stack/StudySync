@@ -21,7 +21,7 @@
             android:background="@drawable/circle_mint"
             android:padding="8dp"
             android:src="@android:drawable/ic_menu_info_details"
-            android:contentDescription="Subject Icon"/>
+            android:contentDescription="@string/Subject_Icon"/>
 
         <LinearLayout
             android:layout_width="0dp"
@@ -33,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Subject"
+                android:text="@string/Subject1"
                 android:textSize="13sp"
                 android:textColor="#888888"/>
 
@@ -41,7 +41,7 @@
                 android:id="@+id/subjectText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Data Structures &amp; Algorithms"
+                android:text="@string/algo"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
         </LinearLayout>
@@ -51,7 +51,7 @@
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:src="@android:drawable/ic_menu_edit"
-            android:contentDescription="Edit Subject"/>
+            android:contentDescription="@string/Edit_Subject"/>
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

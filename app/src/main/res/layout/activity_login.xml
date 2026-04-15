@@ -52,7 +52,7 @@
         android:layout_height="50dp"
         android:text="@string/login_btn"
         android:textAllCaps="false"
-        android:background="@drawable/rounded_bg"
-        android:textColor="@android:color/white" />
+        android:background="@drawable/pill_green"
+        android:textColor="@android:color/black" />
 
 </LinearLayout>
