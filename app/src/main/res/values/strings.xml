@@ -54,7 +54,7 @@
     <string name="pending">⏰ 0 Pending</string>
     <string name="missed">❕0 Missed</string>
     <string name="tag">Your Tasks for Today</string>
-    <string name="revision">In Revision List</string>
+    <string name="revision">Pending Tasks</string>
     <string name="dot">00:00</string>
     <string name="miss">Tasks Missed</string>
     <string name="Course1">Course</string>
@@ -74,7 +74,7 @@
     <string name="wed">Wed</string>
     <string name="thu">Thu</string>
     <string name="completed_f">Task Completed</string>
-    <string name="Profile_Tracker">Profile Tracker</string>
+    <string name="Profile_Tracker">Progress Tracker</string>
     <string name="zero">0</string>
     <string name="fri">Fri</string>
     <string name="sat">Sat</string>
@@ -86,7 +86,7 @@
     <string name="history">✔ History Reading     </string>
     <string name="no">No</string>
     <string name="yes">Yes</string>
-    <string name="tag2">Review completed topics of today?</string>
+    <string name="tag2">Revise completed topics on Sunday?</string>
     <string name="list">Today Task List</string>
     <string name="ADD_TAsk">Add Task</string>
     <string name="percent">0%</string>
@@ -97,7 +97,7 @@
     <string name="date">Monday, 24 Feb</string>
     <string name="bell">🔔</string>
     <string name="lines">☰</string>
-    <string name="hello">Hello, Deepika 👋</string>
+    <string name="hello">Hello👋</string>
     <string name="your">Your Subjects</string>
     <string name="Pending">Pending</string>
     <string name="select_time">Select Time</string>

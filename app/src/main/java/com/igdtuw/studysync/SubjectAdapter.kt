@@ -7,9 +7,12 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
-class SubjectAdapter(private val list: List<Subject>, val onAddTopicClick: (Int) -> Unit,
+class SubjectAdapter(private val list: MutableList<Subject>, val onAddTopicClick: (Int) -> Unit,
     val onEditTopicClick: (Int, Topic) -> Unit,
     val onDeleteTopicClick: (Int, Topic) -> Unit ):
     RecyclerView.Adapter<SubjectAdapter.ViewHolder>() {
@@ -30,6 +33,39 @@ class SubjectAdapter(private val list: List<Subject>, val onAddTopicClick: (Int)
         val subject = list[position]
         
         holder.name.text = subject.name
+        holder.itemView.setOnLongClickListener {
+
+            val context = holder.itemView.context
+
+            AlertDialog.Builder(context)
+                .setTitle("Delete Subject")
+                .setMessage("Are you sure you want to delete this subject?")
+                .setPositiveButton("Delete") { _, _ ->
+
+                    val auth = FirebaseAuth.getInstance()
+                    val db = FirebaseFirestore.getInstance()
+                    val userId = auth.currentUser!!.uid
+
+                    val subjectId = list[position].id
+
+                    db.collection("users")
+                        .document(userId)
+                        .collection("subjects")
+                        .document(subjectId)
+                        .delete()
+                        .addOnSuccessListener {
+                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+
+                            // 🔥 remove from list
+                            list.removeAt(position)
+                            notifyItemRemoved(position)
+                        }
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+
+            true
+        }
         
         holder.topicContainer.removeAllViews()
         for (topic in subject.topics) {
