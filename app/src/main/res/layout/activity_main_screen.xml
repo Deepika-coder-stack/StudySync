@@ -37,19 +37,19 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="@string/date"
+                android:text="Date"
                 android:textAlignment="center"
                 android:textColor="@color/darkText"
                 android:textSize="16sp"/>
 
             <!-- Notification -->
-            <TextView
-                android:id="@+id/notificationIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/bell"
-                android:textSize="20sp"
-                android:padding="8dp"/>
+<!--            <TextView-->
+<!--                android:id="@+id/notificationIcon"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/bell"-->
+<!--                android:textSize="20sp"-->
+<!--                android:padding="8dp"/>-->
         </LinearLayout>
 
         <!-- 👋 GREETING -->
@@ -92,15 +92,15 @@
             android:layout_marginTop="12dp"/>
 
         <!-- ⏱ STUDY HOURS -->
-        <TextView
-            android:id="@+id/studyHours"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/Hours"
-            android:textAlignment="center"
-            android:textSize="16sp"
-            android:textColor="@color/darkText"
-            android:layout_marginTop="12dp"/>
+<!--        <TextView-->
+<!--            android:id="@+id/studyHours"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="@string/Hours"-->
+<!--            android:textAlignment="center"-->
+<!--            android:textSize="16sp"-->
+<!--            android:textColor="@color/darkText"-->
+<!--            android:layout_marginTop="12dp"/>-->
 
     </LinearLayout>
 

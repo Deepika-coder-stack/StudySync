@@ -11,10 +11,13 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var email: EditText
+    val auth = FirebaseAuth.getInstance()
     private lateinit var password: EditText
     private lateinit var loginBtn: Button
 
@@ -24,6 +27,9 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_login)
+        val auth = FirebaseAuth.getInstance()
+        val db= FirebaseFirestore.getInstance()
+
 
         // Initialize Views
         email = findViewById(R.id.email)
@@ -87,7 +93,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun validateLogin() {
-
         val emailText = email.text.toString().trim()
         val passwordText = password.text.toString().trim()
 
@@ -117,11 +122,46 @@ class LoginActivity : AppCompatActivity() {
             return
         }
 
-        // Success
-        Toast.makeText(this, "Login Successful", Toast.LENGTH_SHORT).show()
+        // Firebase Authentication
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
 
-        val intent = Intent(this, BasicInfoActivity::class.java)
-        startActivity(intent)
-        finish()
+        auth.signInWithEmailAndPassword(emailText, passwordText)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+
+                    val userId = auth.currentUser!!.uid
+
+                    // 🔥 CHECK USER DATA IN FIRESTORE
+                    db.collection("users")
+                        .document(userId)
+                        .get()
+                        .addOnSuccessListener { document ->
+
+                            if (document.exists() && document.getString("course") != null) {
+                                // ✅ DATA EXISTS → MAIN SCREEN
+                                startActivity(Intent(this, MainScreen::class.java))
+                                finish()
+                            } else {
+                                // ❌ DATA NOT EXISTS → BASIC INFO
+                                startActivity(Intent(this, BasicInfoActivity::class.java))
+                                finish()
+                            }
+
+                        }
+
+                } else {
+                    // ❌ LOGIN FAIL → SIGNUP
+                    auth.createUserWithEmailAndPassword(emailText, passwordText)
+                        .addOnCompleteListener { signupTask ->
+                            if (signupTask.isSuccessful) {
+                                startActivity(Intent(this, BasicInfoActivity::class.java))
+                                finish()
+                            } else {
+                                Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                }
+            }
     }
 }
