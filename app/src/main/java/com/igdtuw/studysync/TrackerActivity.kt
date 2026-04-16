@@ -21,6 +21,10 @@ class TrackerActivity : AppCompatActivity() {
     private lateinit var startStudyButton: Button
     private lateinit var studyTimer: TextView
     private lateinit var todayTime: TextView
+    private lateinit var tasksCompleted: TextView
+    private lateinit var revisionTasks: TextView
+    private lateinit var tasksMissed: TextView
+    private lateinit var avgStudy: TextView
 
     private var startTime: Long = 0
     private var isRunning = false
@@ -55,6 +59,10 @@ class TrackerActivity : AppCompatActivity() {
         friBar = findViewById(R.id.friBar)
         satBar = findViewById(R.id.satBar)
         sunBar = findViewById(R.id.sunBar)
+        tasksCompleted = findViewById(R.id.tasksCompleted)
+        revisionTasks = findViewById(R.id.revisionTasks)
+        tasksMissed = findViewById(R.id.tasksMissed)
+        avgStudy = findViewById(R.id.avgStudy)
 
         // Timer UI
         startStudyButton = findViewById(R.id.startStudyButton)
@@ -117,6 +125,7 @@ class TrackerActivity : AppCompatActivity() {
         val todayMinutes = pref.getInt(day.toString(), 0)
 
         todayTime.text = "Time Today: $todayMinutes mins"
+        updateWeeklyStats()
     }
 
     private fun saveStudyTime(minutes: Int) {
@@ -131,6 +140,33 @@ class TrackerActivity : AppCompatActivity() {
         editor.putInt(day.toString(), previous + minutes)
 
         editor.apply()
+    }
+
+    private fun updateWeeklyStats() {
+
+        val pref = getSharedPreferences("StudyTime", MODE_PRIVATE)
+
+        var totalMinutes = 0
+        var daysWithStudy = 0
+
+        for (i in 1..7) {
+            val minutes = pref.getInt(i.toString(), 0)
+            totalMinutes += minutes
+
+            if (minutes > 0) daysWithStudy++
+        }
+
+        val avg = if (daysWithStudy > 0) totalMinutes / daysWithStudy else 0
+
+        // 👇 dummy logic for now
+        val completed = totalMinutes / 60   // assume 1 hr = 1 task
+        val pending = 10 - completed
+        val missed = if (pending > 0) pending / 2 else 0
+
+        tasksCompleted.text = "$completed"
+        revisionTasks.text = "$pending"
+        tasksMissed.text = "$missed"
+        avgStudy.text = "${avg / 60.0}"
     }
 
     override fun onSupportNavigateUp(): Boolean {

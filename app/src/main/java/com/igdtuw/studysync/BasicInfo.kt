@@ -1,14 +1,17 @@
 package com.igdtuw.studysync
 
 import android.app.AlertDialog
-import android.content.Intent   // ✅ ADD THIS
+import android.content.Intent
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class BasicInfoActivity : AppCompatActivity() {
 
     private lateinit var subjectsContainer: LinearLayout
+
     private lateinit var btnAdd: Button
     private lateinit var btnContinue: Button
     private lateinit var etCourseName: EditText
@@ -17,6 +20,8 @@ class BasicInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_basic_info)
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
 
         subjectsContainer = findViewById(R.id.subjectsContainer)
         btnAdd = findViewById(R.id.btnAdd)
@@ -28,10 +33,9 @@ class BasicInfoActivity : AppCompatActivity() {
             showInputDialog()
         }
 
-        // ✅ Continue Button (UPDATED)
+        // Continue Button
         btnContinue.setOnClickListener {
-
-            val course = etCourseName.text.toString()
+            val course = etCourseName.text.toString().trim()
             val subjects = getSubjects()
 
             if (course.isEmpty()) {
@@ -45,17 +49,34 @@ class BasicInfoActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            // Optional: show data
-            Toast.makeText(
-                this,
-                "Course: $course\nSubjects: $subjects",
-                Toast.LENGTH_SHORT
-            ).show()
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                val userId = currentUser.uid
+                val userMap = hashMapOf("course" to course)
 
-            // ✅ Navigate to MainScreen
-            val intent = Intent(this, MainScreen::class.java)
-            startActivity(intent)
-            finish()
+                db.collection("users")
+                    .document(userId)
+                    .set(userMap)
+                    .addOnSuccessListener {
+                        // Add each subject to the sub-collection
+                        subjects.forEach { subjectName ->
+                            val subjectMap = hashMapOf("name" to subjectName)
+                            db.collection("users")
+                                .document(userId)
+                                .collection("subjects")
+                                .add(subjectMap)
+                        }
+                        
+                        Toast.makeText(this, "Profile updated successfully", Toast.LENGTH_SHORT).show()
+                        startActivity(Intent(this, MainScreen::class.java))
+                        finish()
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error saving data: ${e.message}", Toast.LENGTH_SHORT).show()
+                    }
+            } else {
+                Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

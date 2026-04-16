@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
 }
 
 android {
@@ -57,25 +58,22 @@ dependencies {
     // Image Library
     implementation("de.hdodenhof:circleimageview:3.1.0")
 
-    // Chart Library (enable later if needed)
-    // implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    // Chart Library
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 
     // Compose (kept because plugin is enabled)
     implementation(libs.androidx.activity.compose)
-    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
 
-    // Testing
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
-    //implementation(androidx.cardview:cardview:1.0.0)
+    // Firebase
+    implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
+    // Testing
     testImplementation(libs.junit)
 
     androidTestImplementation(libs.androidx.junit)
