@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="horizontal"
     android:padding="12dp"
-    android:background="@color/pista"
+    android:background="@drawable/pista"
     android:gravity="center_vertical">
 
     <CheckBox

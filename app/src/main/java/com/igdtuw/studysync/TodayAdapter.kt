@@ -17,6 +17,7 @@ class TodayAdapter(
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val checkBox = view.findViewById<CheckBox>(R.id.checkBox)
         val taskName = view.findViewById<TextView>(R.id.taskName)
+        val taskStatus = view.findViewById<TextView>(R.id.taskStatus)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +29,13 @@ class TodayAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val task = taskList[position]
         holder.taskName.text = task.name
+        
+        // Remove listener before setting checked state to avoid trigger loop
+        holder.checkBox.setOnCheckedChangeListener(null)
         holder.checkBox.isChecked = task.status == "completed"
+        
+        // Set initial status text
+        holder.taskStatus.text = task.status.replaceFirstChar { it.uppercase() }
 
         val context = holder.itemView.context
         val db = FirebaseFirestore.getInstance()
@@ -37,6 +44,11 @@ class TodayAdapter(
         // checkbox -> complete / pending
         holder.checkBox.setOnCheckedChangeListener { _, isChecked ->
             val newStatus = if (isChecked) "completed" else "pending"
+            
+            // Update UI locally first for instant feedback
+            task.status = newStatus
+            holder.taskStatus.text = newStatus.replaceFirstChar { it.uppercase() }
+            
             db.collection("users")
                 .document(userId)
                 .collection("tasks")
@@ -46,11 +58,16 @@ class TodayAdapter(
 
         // long press -> missed
         holder.itemView.setOnLongClickListener {
+            val newStatus = "missed"
+            task.status = newStatus
+            holder.taskStatus.text = "Missed"
+            holder.checkBox.isChecked = false
+            
             db.collection("users")
                 .document(userId)
                 .collection("tasks")
                 .document(task.id)
-                .update("status", "missed")
+                .update("status", newStatus)
 
             Toast.makeText(context, "Marked Missed", Toast.LENGTH_SHORT).show()
             true
