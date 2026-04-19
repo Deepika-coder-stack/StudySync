@@ -12,10 +12,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class SubjectAdapter(private val list: MutableList<Subject>, val onAddTopicClick: (Int) -> Unit,
+class SubjectAdapter(
+    private val list: MutableList<Subject>,
+    val onAddTopicClick: (Int) -> Unit,
     val onEditTopicClick: (Int, Topic) -> Unit,
-    val onDeleteTopicClick: (Int, Topic) -> Unit ):
-    RecyclerView.Adapter<SubjectAdapter.ViewHolder>() {
+    val onDeleteTopicClick: (Int, Topic) -> Unit
+) : RecyclerView.Adapter<SubjectAdapter.ViewHolder>() {
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val name: TextView = itemView.findViewById(R.id.subjectName)
@@ -33,37 +35,42 @@ class SubjectAdapter(private val list: MutableList<Subject>, val onAddTopicClick
         val subject = list[position]
         
         holder.name.text = subject.name
+        
         holder.itemView.setOnLongClickListener {
-
             val context = holder.itemView.context
-
             AlertDialog.Builder(context)
                 .setTitle("Delete Subject")
                 .setMessage("Are you sure you want to delete this subject?")
                 .setPositiveButton("Delete") { _, _ ->
-
                     val auth = FirebaseAuth.getInstance()
                     val db = FirebaseFirestore.getInstance()
-                    val userId = auth.currentUser!!.uid
+                    val currentUser = auth.currentUser
+                    
+                    if (currentUser != null) {
+                        val userId = currentUser.uid
+                        val subjectId = subject.id
 
-                    val subjectId = list[position].id
-
-                    db.collection("users")
-                        .document(userId)
-                        .collection("subjects")
-                        .document(subjectId)
-                        .delete()
-                        .addOnSuccessListener {
-                            Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
-
-                            // 🔥 remove from list
-                            list.removeAt(position)
-                            notifyItemRemoved(position)
+                        if (subjectId.isNotEmpty()) {
+                            db.collection("users")
+                                .document(userId)
+                                .collection("subjects")
+                                .document(subjectId)
+                                .delete()
+                                .addOnSuccessListener {
+                                    Toast.makeText(context, "Deleted", Toast.LENGTH_SHORT).show()
+                                    val currentPos = holder.adapterPosition
+                                    if (currentPos != RecyclerView.NO_POSITION) {
+                                        list.removeAt(currentPos)
+                                        notifyItemRemoved(currentPos)
+                                    }
+                                }
                         }
+                    } else {
+                        Toast.makeText(context, "User not logged in", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 .setNegativeButton("Cancel", null)
                 .show()
-
             true
         }
         
@@ -73,11 +80,11 @@ class SubjectAdapter(private val list: MutableList<Subject>, val onAddTopicClick
             tv.text = "• ${topic.name} (${topic.time})"
             tv.setTextColor(Color.parseColor("#4A90E2"))
             tv.setOnClickListener {
-                onEditTopicClick(position, topic)
+                onEditTopicClick(holder.adapterPosition, topic)
             }
 
             tv.setOnLongClickListener {
-                onDeleteTopicClick(position, topic)
+                onDeleteTopicClick(holder.adapterPosition, topic)
                 true
             }
             tv.textSize = 12f
@@ -85,7 +92,7 @@ class SubjectAdapter(private val list: MutableList<Subject>, val onAddTopicClick
         }
 
         holder.addTopicBtn.setOnClickListener {
-            onAddTopicClick(position)
+            onAddTopicClick(holder.adapterPosition)
         }
         
         holder.itemView.setOnClickListener {

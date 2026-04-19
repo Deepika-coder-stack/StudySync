@@ -39,17 +39,14 @@ class MainScreen : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(layout.activity_main_screen)
 
-
-        val dateText = findViewById<TextView>(R.id.dateText)
+        val dateText = findViewById<TextView>(id.dateText)
         val addSubjectBtn = findViewById<Button>(id.addSubjectBtn)
         addSubjectBtn.setOnClickListener { showAddSubjectDialog() }
-// current date + day
-        val calendar = Calendar.getInstance()
 
+        val calendar = Calendar.getInstance()
         val day = SimpleDateFormat("EEEE", Locale.getDefault()).format(calendar.time)
         val date = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(calendar.time)
 
-// set text
         dateText.text = "$day, $date"
 
         recycler = findViewById(id.subjectRecycler)
@@ -57,54 +54,37 @@ class MainScreen : AppCompatActivity() {
         adapter = SubjectAdapter(
             subjectList,
             // Add
-                { position ->
-                showAddTopicDialog(subjectList[position], adapter)
+            { position ->
+                if (position != RecyclerView.NO_POSITION) {
+                    showAddTopicDialog(subjectList[position])
+                }
             },
             // Edit
             { position, topic ->
-                showEditTopicDialog(subjectList[position], topic, adapter)
+                if (position != RecyclerView.NO_POSITION) {
+                    showEditTopicDialog(subjectList[position], topic)
+                }
             },
             // Delete
             { position, topic ->
-                showDeleteDialog(subjectList[position], topic, adapter)
+                if (position != RecyclerView.NO_POSITION) {
+                    showDeleteDialog(subjectList[position], topic)
+                }
             }
         )
 
         recycler.layoutManager = GridLayoutManager(this, 2)
         recycler.adapter = adapter
 
-        val auth = FirebaseAuth.getInstance()
-        val db = FirebaseFirestore.getInstance()
-        val currentUser = auth.currentUser
-        
-        if (currentUser != null) {
-            val userId = currentUser.uid
-            db.collection("users")
-                .document(userId)
-                .collection("subjects")
-                .get()
-                .addOnSuccessListener { result ->
-                    subjectList.clear()
-                    for (document in result) {
-                        val name = document.getString("name") ?: ""
-                       val id=document.id
-                        val subject = Subject(name, mutableListOf(),id)
-                        subjectList.add(subject)
-                    }
-                    adapter.notifyDataSetChanged()
-                }
-        }
+        loadSubjects()
 
-        val profile = findViewById<TextView>(id.profileIcon)
-        profile.setOnClickListener {
+        findViewById<TextView>(id.profileIcon).setOnClickListener {
             startActivity(Intent(this, ProfileActivity::class.java))
         }
-        val tracker = findViewById<TextView>(id.trackerIcon)
-        tracker.setOnClickListener {
+        findViewById<TextView>(id.trackerIcon).setOnClickListener {
             startActivity(Intent(this, TrackerActivity::class.java))
         }
-        val task = findViewById<TextView>(id.taskIcon)
-        task.setOnClickListener {
+        findViewById<TextView>(id.taskIcon).setOnClickListener {
             startActivity(Intent(this, TaskActivity::class.java))
         }
         
@@ -116,8 +96,7 @@ class MainScreen : AppCompatActivity() {
         scheduleDailyReminder(20, 0, "Progress Check", "Check today's progress")
         scheduleSundayReminder(10, 0)
 
-        val signOut = findViewById<TextView>(id.signOutBtn)
-        signOut.setOnClickListener {
+        findViewById<TextView>(id.signOutBtn).setOnClickListener {
             AlertDialog.Builder(this)
                 .setTitle(getString(string.sign_out))
                 .setMessage(getString(string.sign_out_message))
@@ -125,9 +104,7 @@ class MainScreen : AppCompatActivity() {
                     FirebaseAuth.getInstance().signOut()
                     finish()
                 }
-                .setNegativeButton(getString(string.no)) { dialog, _ ->
-                    dialog.dismiss()
-                }
+                .setNegativeButton(getString(string.no), null)
                 .show()
         }
 
@@ -146,12 +123,64 @@ class MainScreen : AppCompatActivity() {
         }
 
         val mainLayout = findViewById<FrameLayout>(id.main_layout_root)
-        if (mainLayout != null) {
-            ViewCompat.setOnApplyWindowInsetsListener(mainLayout) { v, insets ->
-                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-                insets
-            }
+        ViewCompat.setOnApplyWindowInsetsListener(mainLayout) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+    }
+
+    private fun loadSubjects() {
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
+        val currentUser = auth.currentUser
+        
+        if (currentUser != null) {
+            val userId = currentUser.uid
+            db.collection("users")
+                .document(userId)
+                .collection("subjects")
+                .get()
+                .addOnSuccessListener { result ->
+                    subjectList.clear()
+                    if (result.isEmpty) {
+                        adapter.notifyDataSetChanged()
+                        return@addOnSuccessListener
+                    }
+
+                    var loadedCount = 0
+                    for (document in result) {
+                        val name = document.getString("name") ?: ""
+                        val id = document.id
+                        val subject = Subject(name = name, id = id)
+                        subjectList.add(subject)
+
+                        db.collection("users")
+                            .document(userId)
+                            .collection("tasks")
+                            .whereEqualTo("subjectId", id)
+                            .get()
+                            .addOnSuccessListener { taskResult ->
+                                val topics = mutableListOf<Topic>()
+                                for (taskDoc in taskResult) {
+                                    val task = taskDoc.toObject(Task::class.java)
+                                    val topic = Topic(
+                                        id = taskDoc.id,
+                                        name = task.name,
+                                        subject = task.subject,
+                                        time = task.time,
+                                        status = task.status
+                                    )
+                                    topics.add(topic)
+                                }
+                                subject.topics = topics
+                                loadedCount++
+                                if (loadedCount == result.size()) {
+                                    adapter.notifyDataSetChanged()
+                                }
+                            }
+                    }
+                }
         }
     }
 
@@ -163,21 +192,18 @@ class MainScreen : AppCompatActivity() {
             .setTitle("Add Subject")
             .setView(editText)
             .setPositiveButton("Add") { _, _ ->
-
-                val subjectName = editText.text.toString()
-
+                val subjectName = editText.text.toString().trim()
                 if (subjectName.isEmpty()) {
                     Toast.makeText(this, "Enter subject", Toast.LENGTH_SHORT).show()
                     return@setPositiveButton
                 }
 
                 val auth = FirebaseAuth.getInstance()
+                val currentUser = auth.currentUser ?: return@setPositiveButton
+                val userId = currentUser.uid
                 val db = FirebaseFirestore.getInstance()
-                val userId = auth.currentUser!!.uid
 
-                val subjectMap = hashMapOf(
-                    "name" to subjectName
-                )
+                val subjectMap = hashMapOf("name" to subjectName)
 
                 db.collection("users")
                     .document(userId)
@@ -185,15 +211,14 @@ class MainScreen : AppCompatActivity() {
                     .add(subjectMap)
                     .addOnSuccessListener {
                         Toast.makeText(this, "Subject Added", Toast.LENGTH_SHORT).show()
-
-                        // 🔥 refresh UI
-                        recreate()
+                        loadSubjects() 
                     }
             }
             .setNegativeButton("Cancel", null)
-            .show()    }
+            .show()
+    }
 
-    private fun showAddTopicDialog(subject: Subject, adapter: SubjectAdapter) {
+    private fun showAddTopicDialog(subject: Subject) {
         val builder = AlertDialog.Builder(this)
         builder.setTitle(getString(string.add_topic))
 
@@ -210,29 +235,48 @@ class MainScreen : AppCompatActivity() {
         layout.addView(timeBtn)
 
         var selectedTime = ""
-        var selectedHour = 0
-        var selectedMinute = 0
+        var selectedHour = -1
+        var selectedMinute = -1
 
         timeBtn.setOnClickListener {
             val calendar = Calendar.getInstance()
-            val hour = calendar.get(Calendar.HOUR_OF_DAY)
-            val minute = calendar.get(Calendar.MINUTE)
-
             TimePickerDialog(this, { _, h, m ->
                 selectedHour = h
                 selectedMinute = m
                 selectedTime = String.format(Locale.getDefault(), "%02d:%02d", h, m)
                 timeBtn.text = getString(string.selected_time, selectedTime)
-            }, hour, minute, true).show()
+            }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true).show()
         }
 
         builder.setView(layout)
 
         builder.setPositiveButton(getString(string.save)) { _, _ ->
-            val name = topicInput.text.toString()
+            val name = topicInput.text.toString().trim()
             if (name.isNotEmpty() && selectedHour != -1) {
-                subject.topics.add(Topic(name, selectedTime))
-                adapter.notifyDataSetChanged()
+                val auth = FirebaseAuth.getInstance()
+                val userId = auth.currentUser?.uid ?: return@setPositiveButton
+                val db = FirebaseFirestore.getInstance()
+
+                val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(java.util.Date())
+
+                val taskMap = hashMapOf(
+                    "name" to name,
+                    "time" to selectedTime,
+                    "subject" to subject.name,
+                    "subjectId" to subject.id,
+                    "status" to "pending",
+                    "date" to today,
+                    "revise" to false
+                )
+
+                db.collection("users")
+                    .document(userId)
+                    .collection("tasks")
+                    .add(taskMap)
+                    .addOnSuccessListener {
+                        Toast.makeText(this, "Topic Added Permanently", Toast.LENGTH_SHORT).show()
+                        loadSubjects()
+                    }
 
                 val calendar = Calendar.getInstance()
                 calendar.set(Calendar.HOUR_OF_DAY, selectedHour)
@@ -240,13 +284,9 @@ class MainScreen : AppCompatActivity() {
                 calendar.set(Calendar.SECOND, 0)
                 calendar.set(Calendar.MILLISECOND, 0)
 
-                val timeInMillis = calendar.timeInMillis
-
-                scheduleNotification(
-                    timeInMillis,
-                    "Start Study",
-                    "Start: $name"
-                )
+                scheduleNotification(calendar.timeInMillis, "Start Study", "Start: $name")
+            } else {
+                Toast.makeText(this, "Please enter name and select time", Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -254,11 +294,11 @@ class MainScreen : AppCompatActivity() {
         builder.show()
     }
 
-    fun showEditTopicDialog(subject: Subject, topic: Topic, adapter: SubjectAdapter) {
-        val dialogView = layoutInflater.inflate(R.layout.dialog_add_topic, null)
+    private fun showEditTopicDialog(subject: Subject, topic: Topic) {
+        val dialogView = layoutInflater.inflate(layout.dialog_add_topic, null)
 
-        val topicInput = dialogView.findViewById<EditText>(R.id.topicInput)
-        val timeBtn = dialogView.findViewById<TextView>(R.id.timeBtn)
+        val topicInput = dialogView.findViewById<EditText>(id.topicInput)
+        val timeBtn = dialogView.findViewById<TextView>(id.timeBtn)
 
         topicInput.setText(topic.name)
         timeBtn.text = topic.time
@@ -277,27 +317,47 @@ class MainScreen : AppCompatActivity() {
             .setTitle("Edit Topic")
             .setView(dialogView)
             .setPositiveButton("Update") { _, _ ->
-                topic.name = topicInput.text.toString()
-                topic.time = selectedTime
-                adapter.notifyDataSetChanged()
+                val newName = topicInput.text.toString().trim()
+                val auth = FirebaseAuth.getInstance()
+                val userId = auth.currentUser?.uid ?: return@setPositiveButton
+                val db = FirebaseFirestore.getInstance()
+
+                db.collection("users")
+                    .document(userId)
+                    .collection("tasks")
+                    .document(topic.id)
+                    .update("name", newName, "time", selectedTime)
+                    .addOnSuccessListener {
+                        loadSubjects()
+                    }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
-    fun showDeleteDialog(subject: Subject, topic: Topic, adapter: SubjectAdapter) {
+    private fun showDeleteDialog(subject: Subject, topic: Topic) {
         AlertDialog.Builder(this)
             .setTitle("Delete Topic")
             .setMessage("Are you sure you want to delete?")
             .setPositiveButton("Yes") { _, _ ->
-                subject.topics.remove(topic)
-                adapter.notifyDataSetChanged()
+                val auth = FirebaseAuth.getInstance()
+                val userId = auth.currentUser?.uid ?: return@setPositiveButton
+                val db = FirebaseFirestore.getInstance()
+
+                db.collection("users")
+                    .document(userId)
+                    .collection("tasks")
+                    .document(topic.id)
+                    .delete()
+                    .addOnSuccessListener {
+                        loadSubjects()
+                    }
             }
             .setNegativeButton("No", null)
             .show()
     }
 
-    fun scheduleNotification(timeInMillis: Long, title: String, message: String) {
+    private fun scheduleNotification(timeInMillis: Long, title: String, message: String) {
         val intent = Intent(this, ReminderReceiver::class.java)
         intent.putExtra("title", title)
         intent.putExtra("message", message)
@@ -310,14 +370,10 @@ class MainScreen : AppCompatActivity() {
         )
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.set(
-            AlarmManager.RTC_WAKEUP,
-            timeInMillis,
-            pendingIntent
-        )
+        alarmManager.set(AlarmManager.RTC_WAKEUP, timeInMillis, pendingIntent)
     }
 
-    fun scheduleDailyReminder(hour: Int, minute: Int, title: String, message: String) {
+    private fun scheduleDailyReminder(hour: Int, minute: Int, title: String, message: String) {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.HOUR_OF_DAY, hour)
         calendar.set(Calendar.MINUTE, minute)
@@ -335,15 +391,10 @@ class MainScreen : AppCompatActivity() {
         )
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY,
-            pendingIntent
-        )
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
     }
 
-    fun scheduleSundayReminder(hour: Int, minute: Int) {
+    private fun scheduleSundayReminder(hour: Int, minute: Int) {
         val calendar = Calendar.getInstance()
         calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
         calendar.set(Calendar.HOUR_OF_DAY, hour)
@@ -361,11 +412,6 @@ class MainScreen : AppCompatActivity() {
         )
 
         val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setRepeating(
-            AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis,
-            AlarmManager.INTERVAL_DAY * 7,
-            pendingIntent
-        )
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_DAY * 7, pendingIntent)
     }
 }

@@ -1,20 +1,22 @@
 package com.igdtuw.studysync
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class EditProfileActivity : AppCompatActivity() {
 
     private lateinit var name: EditText
     private lateinit var course: EditText
-    private lateinit var subject: EditText
     private lateinit var email: EditText
     private lateinit var saveButton: Button
+
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,52 +25,62 @@ class EditProfileActivity : AppCompatActivity() {
         // View Binding
         name = findViewById(R.id.editName)
         course = findViewById(R.id.editCourse)
-        subject = findViewById(R.id.editSubject)
         email = findViewById(R.id.editEmail)
         saveButton = findViewById(R.id.saveButton)
 
-        // SharedPreferences
-        val sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
-
-        // Load saved data
-        name.setText(sharedPref.getString("name", ""))
-        course.setText(sharedPref.getString("course", ""))
-        subject.setText(sharedPref.getString("subject", ""))
-        email.setText(sharedPref.getString("email", ""))
+        loadCurrentData()
 
         saveButton.setOnClickListener {
-
-            val nameText = name.text.toString().trim()
             val courseText = course.text.toString().trim()
-            val subjectText = subject.text.toString().trim()
-            val emailText = email.text.toString().trim()
 
-            // Validation
-            if (nameText.isEmpty() || courseText.isEmpty() || subjectText.isEmpty() || emailText.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
+            if (courseText.isEmpty()) {
+                Toast.makeText(this, "Please enter course", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Save data in SharedPreferences
-            val editor = sharedPref.edit()
-            editor.putString("name", nameText)
-            editor.putString("course", courseText)
-            editor.putString("subject", subjectText)
-            editor.putString("email", emailText)
-            editor.apply()
-
-            // Send data back to ProfileActivity
-            val resultIntent = Intent()
-            resultIntent.putExtra("name", nameText)
-            resultIntent.putExtra("course", courseText)
-            resultIntent.putExtra("subject", subjectText)
-            resultIntent.putExtra("email", emailText)
-
-            setResult(Activity.RESULT_OK, resultIntent)
-
-            Toast.makeText(this, "Profile Updated", Toast.LENGTH_SHORT).show()
-
-            finish()
+            saveDataToFirestore(courseText)
         }
+    }
+
+    private fun loadCurrentData() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val userEmail = currentUser.email ?: ""
+            email.setText(userEmail)
+            
+            val nameFromEmail = if (userEmail.contains("@")) {
+                userEmail.substringBefore("@")
+            } else {
+                "User"
+            }
+            name.setText(nameFromEmail)
+
+            val userId = currentUser.uid
+            db.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val currentCourse = document.getString("course") ?: ""
+                        course.setText(currentCourse)
+                    }
+                }
+        }
+    }
+
+    private fun saveDataToFirestore(newCourse: String) {
+        val userId = auth.currentUser?.uid ?: return
+        
+        val userMap = hashMapOf<String, Any>(
+            "course" to newCourse
+        )
+
+        db.collection("users").document(userId)
+            .update(userMap)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Profile Updated Successfully", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            .addOnFailureListener { e ->
+                Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
     }
 }

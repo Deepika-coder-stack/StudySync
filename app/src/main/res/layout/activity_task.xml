@@ -104,12 +104,19 @@
             android:layout_marginTop="16dp"/>
 
         <!-- TASK LIST -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/todayRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"/>
+
         <LinearLayout
             android:id="@+id/taskContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="16dp"/>
+            android:layout_marginTop="16dp"
+            android:visibility="gone"/>
 
 
         <!-- BOTTOM REVIEW BOX -->
