@@ -2,11 +2,16 @@ package com.igdtuw.studysync
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import java.util.Calendar
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
+import java.util.*
 
 class TrackerActivity : AppCompatActivity() {
 
@@ -29,18 +34,16 @@ class TrackerActivity : AppCompatActivity() {
     private var startTime: Long = 0
     private var isRunning = false
 
-    private val handler = Handler()
+    private val handler = Handler(Looper.getMainLooper())
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
     private val timerRunnable = object : Runnable {
         override fun run() {
-
             val time = System.currentTimeMillis() - startTime
-
             val seconds = (time / 1000) % 60
             val minutes = (time / 60000)
-
             studyTimer.text = String.format("%02d:%02d", minutes, seconds)
-
             handler.postDelayed(this, 1000)
         }
     }
@@ -59,6 +62,7 @@ class TrackerActivity : AppCompatActivity() {
         friBar = findViewById(R.id.friBar)
         satBar = findViewById(R.id.satBar)
         sunBar = findViewById(R.id.sunBar)
+        
         tasksCompleted = findViewById(R.id.tasksCompleted)
         revisionTasks = findViewById(R.id.revisionTasks)
         tasksMissed = findViewById(R.id.tasksMissed)
@@ -69,104 +73,121 @@ class TrackerActivity : AppCompatActivity() {
         studyTimer = findViewById(R.id.studyTimer)
         todayTime = findViewById(R.id.todayTime)
 
-        loadStudyData()
+        loadWeeklyData()
 
         startStudyButton.setOnClickListener {
-
             if (!isRunning) {
-
-                // START TIMER
                 startTime = System.currentTimeMillis()
                 handler.post(timerRunnable)
-
                 startStudyButton.text = "Stop Study"
                 isRunning = true
-
             } else {
-
-                // STOP TIMER
                 handler.removeCallbacks(timerRunnable)
-
-                val minutes = ((System.currentTimeMillis() - startTime) / 60000).toInt()
-
+                val durationMillis = System.currentTimeMillis() - startTime
+                val minutes = (durationMillis / 60000).toInt()
                 saveStudyTime(minutes)
-
-                loadStudyData()
-
                 studyTimer.text = "00:00"
                 startStudyButton.text = "Start Study"
-
                 isRunning = false
             }
         }
     }
 
-    private fun loadStudyData() {
+    private fun loadWeeklyData() {
+        val userId = auth.currentUser?.uid ?: return
+        
+        val calendar = Calendar.getInstance()
+        // Get start of week (Sunday)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        val startOfWeek = calendar.time
 
-        val pref = getSharedPreferences("StudyTime", MODE_PRIVATE)
+        val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        
+        // Fetch all tasks for the week to calculate stats
+        db.collection("users").document(userId).collection("tasks")
+            .whereGreaterThanOrEqualTo("date", sdf.format(startOfWeek))
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                
+                var completed = 0
+                var pending = 0
+                var missed = 0
+                
+                value?.forEach { doc ->
+                    val status = doc.getString("status")?.lowercase()
+                    when (status) {
+                        "completed" -> completed++
+                        "pending" -> pending++
+                        "missed" -> missed++
+                    }
+                }
+                
+                tasksCompleted.text = completed.toString()
+                revisionTasks.text = pending.toString()
+                tasksMissed.text = missed.toString()
+            }
 
-        val mon = pref.getInt("2", 0)
-        val tue = pref.getInt("3", 0)
-        val wed = pref.getInt("4", 0)
-        val thu = pref.getInt("5", 0)
-        val fri = pref.getInt("6", 0)
-        val sat = pref.getInt("7", 0)
-        val sun = pref.getInt("1", 0)
+        // Fetch study time for the week
+        db.collection("users").document(userId).collection("study_time")
+            .whereGreaterThanOrEqualTo("date", sdf.format(startOfWeek))
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                
+                val weekTimeMap = mutableMapOf<Int, Int>() // DayOfWeek to Minutes
+                var totalMinutes = 0
+                var daysCount = 0
 
-        monBar.progress = mon
-        tueBar.progress = tue
-        wedBar.progress = wed
-        thuBar.progress = thu
-        friBar.progress = fri
-        satBar.progress = sat
-        sunBar.progress = sun
+                value?.forEach { doc ->
+                    val dateStr = doc.getString("date") ?: ""
+                    val mins = doc.getLong("minutes")?.toInt() ?: 0
+                    
+                    val date = sdf.parse(dateStr)
+                    val cal = Calendar.getInstance()
+                    if (date != null) {
+                        cal.time = date
+                        val dayOfWeek = cal.get(Calendar.DAY_OF_WEEK)
+                        weekTimeMap[dayOfWeek] = (weekTimeMap[dayOfWeek] ?: 0) + mins
+                        totalMinutes += mins
+                    }
+                }
 
-        val day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
-        val todayMinutes = pref.getInt(day.toString(), 0)
+                updateBars(weekTimeMap)
+                
+                val todayCal = Calendar.getInstance()
+                val todayMins = weekTimeMap[todayCal.get(Calendar.DAY_OF_WEEK)] ?: 0
+                todayTime.text = "Time Today: $todayMins mins"
 
-        todayTime.text = "Time Today: $todayMinutes mins"
-        updateWeeklyStats()
+                val avgHrs = (totalMinutes / 60.0) / 7.0
+                avgStudy.text = String.format("%.1f hrs", avgHrs)
+            }
+    }
+
+    private fun updateBars(weekTimeMap: Map<Int, Int>) {
+        monBar.progress = weekTimeMap[Calendar.MONDAY] ?: 0
+        tueBar.progress = weekTimeMap[Calendar.TUESDAY] ?: 0
+        wedBar.progress = weekTimeMap[Calendar.WEDNESDAY] ?: 0
+        thuBar.progress = weekTimeMap[Calendar.THURSDAY] ?: 0
+        friBar.progress = weekTimeMap[Calendar.FRIDAY] ?: 0
+        satBar.progress = weekTimeMap[Calendar.SATURDAY] ?: 0
+        sunBar.progress = weekTimeMap[Calendar.SUNDAY] ?: 0
     }
 
     private fun saveStudyTime(minutes: Int) {
-
-        val pref = getSharedPreferences("StudyTime", MODE_PRIVATE)
-        val editor = pref.edit()
-
-        val day = Calendar.getInstance().get(Calendar.DAY_OF_WEEK)
-
-        val previous = pref.getInt(day.toString(), 0)
-
-        editor.putInt(day.toString(), previous + minutes)
-
-        editor.apply()
-    }
-
-    private fun updateWeeklyStats() {
-
-        val pref = getSharedPreferences("StudyTime", MODE_PRIVATE)
-
-        var totalMinutes = 0
-        var daysWithStudy = 0
-
-        for (i in 1..7) {
-            val minutes = pref.getInt(i.toString(), 0)
-            totalMinutes += minutes
-
-            if (minutes > 0) daysWithStudy++
+        val userId = auth.currentUser?.uid ?: return
+        val today = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
+        
+        val docRef = db.collection("users").document(userId).collection("study_time").document(today)
+        
+        db.runTransaction { transaction ->
+            val snapshot = transaction.get(docRef)
+            val currentMins = if (snapshot.exists()) snapshot.getLong("minutes") ?: 0L else 0L
+            transaction.set(docRef, hashMapOf(
+                "date" to today,
+                "minutes" to currentMins + minutes
+            ))
+        }.addOnSuccessListener {
+            Toast.makeText(this, "Study time saved!", Toast.LENGTH_SHORT).show()
         }
-
-        val avg = if (daysWithStudy > 0) totalMinutes / daysWithStudy else 0
-
-        // 👇 dummy logic for now
-        val completed = totalMinutes / 60   // assume 1 hr = 1 task
-        val pending = 10 - completed
-        val missed = if (pending > 0) pending / 2 else 0
-
-        tasksCompleted.text = "$completed"
-        revisionTasks.text = "$pending"
-        tasksMissed.text = "$missed"
-        avgStudy.text = "${avg / 60.0}"
     }
 
     override fun onSupportNavigateUp(): Boolean {

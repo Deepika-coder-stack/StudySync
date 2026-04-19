@@ -1,14 +1,16 @@
 package com.igdtuw.studysync
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ProfileActivity : AppCompatActivity() {
@@ -20,44 +22,16 @@ class ProfileActivity : AppCompatActivity() {
 
     private lateinit var nameText: TextView
     private lateinit var courseText: TextView
-    private lateinit var subjectText: TextView
     private lateinit var emailText: TextView
 
-    private lateinit var sharedPref: android.content.SharedPreferences
+    private val auth = FirebaseAuth.getInstance()
+    private val db = FirebaseFirestore.getInstance()
 
-    // IMAGE PICKER
     private val pickImageLauncher =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             uri?.let {
                 profileImage.setImageURI(it)
-                sharedPref.edit().putString("profileImage", it.toString()).apply()
-            }
-        }
-
-    // EDIT PROFILE RESULT
-    private val editProfileLauncher =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-
-            if (result.resultCode == Activity.RESULT_OK) {
-
-                val data = result.data
-
-                val name = data?.getStringExtra("name")
-                val course = data?.getStringExtra("course")
-                val subject = data?.getStringExtra("subject")
-                val email = data?.getStringExtra("email")
-
-                name?.let { nameText.text = it }
-                course?.let { courseText.text = it }
-                subject?.let { subjectText.text = it }
-                email?.let { emailText.text = it }
-
-                sharedPref.edit()
-                    .putString("name", name)
-                    .putString("course", course)
-                    .putString("subject", subject)
-                    .putString("email", email)
-                    .apply()
+                saveProfileImage(it.toString())
             }
         }
 
@@ -65,7 +39,6 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_profile)
 
-        // VIEW BINDING
         profileImage = findViewById(R.id.profileImage)
         cameraIcon = findViewById(R.id.cameraIcon)
         editIcon = findViewById(R.id.editIcon)
@@ -73,42 +46,65 @@ class ProfileActivity : AppCompatActivity() {
 
         nameText = findViewById(R.id.nameText)
         courseText = findViewById(R.id.courseText)
-        subjectText = findViewById(R.id.subjectText)
         emailText = findViewById(R.id.emailText)
 
-        sharedPref = getSharedPreferences("UserProfile", MODE_PRIVATE)
+        loadProfileData()
 
-        loadProfile()
-
-        // PROFILE IMAGE CLICK
         profileImage.setOnClickListener { openGallery() }
         cameraIcon.setOnClickListener { openGallery() }
 
-        // EDIT PROFILE CLICK
         editIcon.setOnClickListener {
             val intent = Intent(this, EditProfileActivity::class.java)
-            editProfileLauncher.launch(intent)
+            startActivity(intent)
         }
 
-        // OPEN TRACKER SCREEN
         openTrackerButton.setOnClickListener {
             val intent = Intent(this, TrackerActivity::class.java)
             startActivity(intent)
         }
     }
 
-    private fun loadProfile() {
+    override fun onResume() {
+        super.onResume()
+        loadProfileData() // Refresh data when coming back from EditProfile
+    }
 
-        nameText.text = sharedPref.getString("name", "Priya Sharma")
-        courseText.text = sharedPref.getString("course", "B.Tech CSE")
-        subjectText.text = sharedPref.getString("subject", "Computer Science")
-        emailText.text = sharedPref.getString("email", "example@gmail.com")
+    private fun loadProfileData() {
+        val currentUser = auth.currentUser
+        if (currentUser != null) {
+            val email = currentUser.email ?: ""
+            emailText.text = email
+            
+            val nameFromEmail = if (email.contains("@")) {
+                email.substringBefore("@")
+            } else {
+                "User"
+            }
+            nameText.text = nameFromEmail
 
-        val savedImageUri = sharedPref.getString("profileImage", null)
-
-        savedImageUri?.let {
-            profileImage.setImageURI(Uri.parse(it))
+            val userId = currentUser.uid
+            db.collection("users").document(userId).get()
+                .addOnSuccessListener { document ->
+                    if (document.exists()) {
+                        val course = document.getString("course") ?: "Not Set"
+                        courseText.text = course
+                        
+                        val profileImgUri = document.getString("profileImage")
+                        if (!profileImgUri.isNullOrEmpty()) {
+                            profileImage.setImageURI(Uri.parse(profileImgUri))
+                        }
+                    }
+                }
         }
+    }
+
+    private fun saveProfileImage(uriString: String) {
+        val userId = auth.currentUser?.uid ?: return
+        db.collection("users").document(userId)
+            .update("profileImage", uriString)
+            .addOnSuccessListener {
+                Toast.makeText(this, "Profile Picture Updated", Toast.LENGTH_SHORT).show()
+            }
     }
 
     private fun openGallery() {

@@ -1,14 +1,33 @@
 package com.igdtuw.studysync
 
 import android.app.AlertDialog
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+
+data class Task(
+    var id: String = "",
+    var name: String = "",
+    var status: String = "pending",
+    var date: String = "",
+    var subject: String = "",
+    var subjectId: String = "",
+    var revise: Boolean = false,
+    var time: String = ""
+)
 
 class TaskActivity : AppCompatActivity() {
 
-    private lateinit var taskContainer: LinearLayout
     private lateinit var progressBar: ProgressBar
     private lateinit var progressText: TextView
     private lateinit var addTaskBtn: Button
@@ -17,132 +36,108 @@ class TaskActivity : AppCompatActivity() {
     private lateinit var pendingCount: TextView
     private lateinit var missedCount: TextView
 
-    // NEW (Bottom buttons)
     private lateinit var btnYes: Button
     private lateinit var btnNo: Button
 
-    private val tasks = mutableListOf<Task>()
-
-    data class Task(
-        var name: String,
-        var status: String = "Pending"
-    )
+    private val list = mutableListOf<Task>()
+    private lateinit var adapter: TodayAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task)
+        
+        val recyclerView = findViewById<RecyclerView>(R.id.todayRecyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        adapter = TodayAdapter(list)
+        recyclerView.adapter = adapter
 
         // Views
-        taskContainer = findViewById(R.id.taskContainer)
         progressBar = findViewById(R.id.progressBar)
         progressText = findViewById(R.id.progressText)
         addTaskBtn = findViewById(R.id.addTaskBtn)
+        
+        // Hide Add Task button as requested
+        addTaskBtn.visibility = View.GONE
 
         completedCount = findViewById(R.id.completedCount)
         pendingCount = findViewById(R.id.pendingCount)
         missedCount = findViewById(R.id.missedCount)
 
-        // Bottom buttons
         btnYes = findViewById(R.id.btnYes)
         btnNo = findViewById(R.id.btnNo)
 
-        // Add Task
-        addTaskBtn.setOnClickListener {
-            showAddTaskDialog()
-        }
+        loadTasks()
 
-        // YES button
+        // YES button (Sunday Revision Logic)
         btnYes.setOnClickListener {
-            Toast.makeText(this, "Great! Keep it up 👍", Toast.LENGTH_SHORT).show()
-        }
+            val auth = FirebaseAuth.getInstance()
+            val userId = auth.currentUser?.uid ?: return@setOnClickListener
+            val db = FirebaseFirestore.getInstance()
 
-        // NO button
-        btnNo.setOnClickListener {
-            Toast.makeText(this, "Try to review tomorrow!", Toast.LENGTH_SHORT).show()
-        }
-    }
+            val calendar = Calendar.getInstance()
+            calendar.add(Calendar.WEEK_OF_YEAR, 1)
+            val nextSunday = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(calendar.time)
 
-    // Dialog
-    private fun showAddTaskDialog() {
-        val input = EditText(this)
-        input.hint = "Enter task"
-
-        AlertDialog.Builder(this)
-            .setTitle("Add Task")
-            .setView(input)
-            .setPositiveButton("Add") { _, _ ->
-                val taskName = input.text.toString().trim()
-                if (taskName.isNotEmpty()) {
-                    addTask(taskName)
-                } else {
-                    Toast.makeText(this, "Enter valid task", Toast.LENGTH_SHORT).show()
+            db.collection("users").document(userId).collection("tasks")
+                .whereEqualTo("status", "completed")
+                .get()
+                .addOnSuccessListener {
+                    for (doc in it) {
+                        val task = doc.toObject(Task::class.java)
+                        val newTask = hashMapOf(
+                            "name" to task.name,
+                            "subject" to task.subject,
+                            "subjectId" to task.subjectId,
+                            "date" to nextSunday,
+                            "status" to "pending",
+                            "revise" to true,
+                            "time" to task.time
+                        )
+                        db.collection("users").document(userId).collection("tasks").add(newTask)
+                    }
+                    Toast.makeText(this, "Revision tasks scheduled for next Sunday!", Toast.LENGTH_SHORT).show()
                 }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-
-    // Add Task View
-    private fun addTask(name: String) {
-        val view = layoutInflater.inflate(R.layout.item_task, taskContainer, false)
-
-        val checkBox = view.findViewById<CheckBox>(R.id.checkBox)
-        val taskName = view.findViewById<TextView>(R.id.taskName)
-        val taskStatus = view.findViewById<TextView>(R.id.taskStatus)
-
-        taskName.text = name
-        taskStatus.text = "Pending"
-
-        val task = Task(name)
-        tasks.add(task)
-
-        // Checkbox logic
-        checkBox.setOnCheckedChangeListener { _, isChecked ->
-            if (isChecked) {
-                task.status = "Completed"
-                taskStatus.text = "Completed"
-                taskStatus.setTextColor(
-                    ContextCompat.getColor(this, android.R.color.holo_green_dark)
-                )
-            } else {
-                task.status = "Pending"   // this = Incomplete
-                taskStatus.text = "Pending"
-                taskStatus.setTextColor(
-                    ContextCompat.getColor(this, android.R.color.holo_orange_dark)
-                )
-            }
-            updateStats()
         }
 
-        // Long press → Missed
-        view.setOnLongClickListener {
-            task.status = "Missed"
-            taskStatus.text = "Missed"
-            taskStatus.setTextColor(
-                ContextCompat.getColor(this, android.R.color.holo_red_dark)
-            )
-            checkBox.isChecked = false
-            updateStats()
-            true
+        btnNo.setOnClickListener {
+            Toast.makeText(this, "Keep going!", Toast.LENGTH_SHORT).show()
         }
-
-        taskContainer.addView(view)
-        updateStats()
     }
 
-    // Update UI
-    private fun updateStats() {
-        val total = tasks.size
-        val completed = tasks.count { it.status == "Completed" }
-        val pending = tasks.count { it.status == "Pending" }
-        val missed = tasks.count { it.status == "Missed" }
+    private fun loadTasks() {
+        val auth = FirebaseAuth.getInstance()
+        val db = FirebaseFirestore.getInstance()
+        val userId = auth.currentUser?.uid ?: return
+
+        db.collection("users")
+            .document(userId)
+            .collection("tasks")
+            .addSnapshotListener { value, error ->
+                if (error != null) return@addSnapshotListener
+                
+                list.clear()
+                for (doc in value!!) {
+                    val task = doc.toObject(Task::class.java)
+                    task.id = doc.id
+                    list.add(task)
+                }
+                adapter.notifyDataSetChanged()
+                updateStatsFromList(list)
+            }
+    }
+
+    private fun updateStatsFromList(list: List<Task>) {
+        val total = list.size
+        val completed = list.count { it.status.lowercase() == "completed" }
+        val pending = list.count { it.status.lowercase() == "pending" }
+        val missed = list.count { it.status.lowercase() == "missed" }
 
         completedCount.text = "$completed Completed"
         pendingCount.text = "$pending Pending"
         missedCount.text = "$missed Missed"
 
         val percent = if (total == 0) 0 else (completed * 100) / total
-
         progressBar.progress = percent
         progressText.text = "$percent%"
     }
