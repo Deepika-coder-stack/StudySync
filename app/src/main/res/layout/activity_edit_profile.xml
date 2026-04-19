@@ -26,7 +26,7 @@
             android:layout_gravity="center"
             android:layout_marginBottom="25dp"/>
 
-        <!-- NAME -->
+        <!-- NAME (Derived from Email, non-editable) -->
 
         <TextView
             android:layout_width="wrap_content"
@@ -36,23 +36,21 @@
             android:textStyle="bold"/>
 
         <EditText
-            android:autofillHints="name"
             android:id="@+id/editName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="50dp"
-            android:hint="@string/Enter_name"
+            android:enabled="false"
             android:inputType="textPersonName"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:textColorHint="@color/text_light"
+            android:textColor="@color/text_light"
             android:background="@drawable/primary_blue"
             android:layout_marginTop="6dp"/>
 
         <!-- COURSE -->
 
         <TextView
-            android:autofillHints="name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/Course"
@@ -61,7 +59,6 @@
             android:layout_marginTop="16dp"/>
 
         <EditText
-            android:autofillHints="name"
             android:id="@+id/editCourse"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -74,35 +71,9 @@
             android:background="@drawable/primary_blue"
             android:layout_marginTop="6dp"/>
 
-        <!-- SUBJECT -->
+        <!-- EMAIL (Non-editable) -->
 
         <TextView
-            android:autofillHints="name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Subject"
-            android:textColor="@color/text_dark"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
-
-        <EditText
-            android:autofillHints="name"
-            android:id="@+id/editSubject"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="50dp"
-            android:hint="@string/Enter_subject"
-            android:inputType="text"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:textColorHint="@color/text_light"
-            android:background="@drawable/primary_blue"
-            android:layout_marginTop="6dp"/>
-
-        <!-- EMAIL -->
-
-        <TextView
-            android:autofillHints="emailAddress"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/Email"
@@ -111,48 +82,21 @@
             android:layout_marginTop="16dp"/>
 
         <EditText
-            android:autofillHints="emailAddress"
             android:id="@+id/editEmail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:minHeight="50dp"
-            android:hint="@string/Enter_email"
+            android:enabled="false"
             android:inputType="textEmailAddress"
             android:paddingStart="12dp"
             android:paddingEnd="12dp"
-            android:textColorHint="@color/text_light"
-            android:background="@drawable/primary_blue"
-            android:layout_marginTop="6dp"/>
-
-        <!-- PASSWORD -->
-
-        <TextView
-            android:autofillHints="password"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/Password"
-            android:textColor="@color/text_dark"
-            android:textStyle="bold"
-            android:layout_marginTop="16dp"/>
-
-        <EditText
-            android:id="@+id/editPassword"
-            android:autofillHints="password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="50dp"
-            android:hint="@string/Enter_password"
-            android:inputType="textPassword"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            android:textColorHint="@color/text_light"
+            android:textColor="@color/text_light"
             android:background="@drawable/primary_blue"
             android:layout_marginTop="6dp"/>
 
         <!-- SAVE BUTTON -->
 
         <Button
-            android:autofillHints="username"
             android:id="@+id/saveButton"
             android:layout_width="match_parent"
             android:layout_height="55dp"

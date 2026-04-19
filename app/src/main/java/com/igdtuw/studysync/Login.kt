@@ -157,8 +157,6 @@ class LoginActivity : AppCompatActivity() {
                             if (signupTask.isSuccessful) {
                                 startActivity(Intent(this, BasicInfoActivity::class.java))
                                 finish()
-                            } else {
-                                Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()
                             }
                         }
                 }
